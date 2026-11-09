@@ -1,0 +1,8 @@
+{
+  "five_hour": {"utilization": 42.0, "resets_at": "2026-11-09T21:00:00.000000+00:00", "iguana_necktie": "REDACTED", "burst": {"x": 1}},
+  "seven_day": {"utilization": 18.0, "resets_at": "2026-11-14T08:00:00.000000+00:00", "new_field": [1, 2, 3]},
+  "seven_day_opus": null,
+  "seven_day_sonnet": null,
+  "extra_usage": {"is_enabled": false, "monthly_limit": null},
+  "iguana_necktie": null
+}

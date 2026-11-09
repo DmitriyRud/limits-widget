@@ -1,0 +1,22 @@
+{
+  "user_id": "REDACTED",
+  "plan_type": "pro",
+  "brand_new_top_level": {"nested": [1, 2, 3]},
+  "rate_limit": {
+    "allowed": true,
+    "future_flag": "REDACTED",
+    "primary_window": {
+      "used_percent": 0,
+      "limit_window_seconds": 18000,
+      "reset_at": 1794267824,
+      "future_window_field": {"a": null}
+    },
+    "secondary_window": {
+      "used_percent": 14,
+      "limit_window_seconds": 604800,
+      "reset_at": 1794829044,
+      "another_unknown": 42
+    },
+    "tertiary_window": {"used_percent": 99, "limit_window_seconds": 60, "reset_at": 1}
+  }
+}

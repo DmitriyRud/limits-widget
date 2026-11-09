@@ -1,0 +1,9 @@
+{"timestamp": "2026-11-09T09:00:00.000Z", "type": "session_meta", "payload": {"id": "REDACTED"
+
+not json at all
+{"timestamp": "2026-11-09T10:15:30.123Z", "type": "event_msg", "payload": {"type": "token_count", "info": {"total_token_usage": {"input_tokens": 100, "output_tokens": 5, "future_field": 1}}, "rate_limits": {"limit_id": "codex", "plan_type": "REDACTED", "primary": {"used_percent": 38.0, "window_minutes": 300, "resets_at": 1793990035, "extra": "x"}, "secondary": {"used_percent": 60.0, "window_minutes": 10080, "resets_at": 1794223159}, "credits": {"has_credits": false, "unlimited": false, "balance": "0"}, "new_unknown": {"a": 1}}}}
+
+{"timestamp": "2026-11-09T10:40:00.000Z", "type": "event_msg", "payload": {"type": "token_count", "rate_limits": {"primary": {"used_percent": 77.0, "window_mi
+[1,2,3]
+
+
