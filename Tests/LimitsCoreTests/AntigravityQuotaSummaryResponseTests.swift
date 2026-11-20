@@ -21,11 +21,11 @@ struct AntigravityQuotaSummaryResponseTests {
         let titles = windows.map { ResetFormatter.title(for: $0.kind) }
         #expect(
             titles == [
-                "Gemini · 5 ч",
-                "Gemini · Неделя",
-                "Claude & GPT · 5 ч",
-                "Claude & GPT · Неделя",
-                "Gemini 4 Argon · Неделя",
+                "Gemini · 5h",
+                "Gemini · Weekly",
+                "Claude & GPT · 5h",
+                "Claude & GPT · Weekly",
+                "Gemini 4 Argon · Weekly",
             ])
 
         #expect(abs(windows[0].usedPercent - (1 - 0.9839749) * 100) < 0.0001)

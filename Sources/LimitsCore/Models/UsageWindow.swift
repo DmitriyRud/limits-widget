@@ -1,5 +1,12 @@
 import Foundation
 
+/// Период окна внутри группы моделей (для локализуемого форматирования).
+public enum WindowPeriod: Hashable, Sendable {
+    case fiveHour
+    case weekly
+    case other(String)
+}
+
 /// Тип окна лимита. Подпись в UI строится из него, а не из провайдера.
 public enum WindowKind: Hashable, Sendable {
     /// Короткое скользящее окно (5 часов) — «дневной» лимит.
@@ -10,7 +17,9 @@ public enum WindowKind: Hashable, Sendable {
     case weeklyModel(String)
     /// Общий агрегированный лимит (например, минимум по моделям).
     case overall
-    /// Именованное окно лимита (например, пул моделей + период: «Gemini · 5 ч»).
+    /// Структурированное окно группы моделей (например, "Gemini" + `.fiveHour` / `.weekly`).
+    case group(String, WindowPeriod)
+    /// Именованное окно лимита (произвольная подпись).
     case named(String)
     /// Окно нестандартной длины.
     case custom(minutes: Int)

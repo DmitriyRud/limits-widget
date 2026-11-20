@@ -1,19 +1,23 @@
 import LimitsCore
 
-/// Все пользовательские тексты статусов виджета — в одном месте (FR-005, FR-008).
+/// Localized user-facing status strings for the widget.
 enum StatusText {
-    static let noProvidersHint = "Включите агентов в настройках"
+    static func noProvidersHint(language: AppLanguage) -> String {
+        L10n.noProvidersHint(language)
+    }
 
-    /// Текст для не-ok статуса.
-    static func message(for snapshot: ProviderSnapshot) -> String {
+    /// Message for non-ok provider status.
+    static func message(for snapshot: ProviderSnapshot, language: AppLanguage) -> String {
         switch snapshot.status {
         case .ok: ""
-        case .notAuthenticated: "Не авторизован"
-        case .tokenExpired: "Требуется вход — откройте \(snapshot.displayName)"
-        case .noData: "Нет данных"
-        case .error(let message): message
+        case .notAuthenticated: L10n.notAuthenticated(language)
+        case .tokenExpired: L10n.tokenExpired(displayName: snapshot.displayName, language)
+        case .noData: L10n.noData(language)
+        case .error(let message): L10n.localizedProviderError(message, language)
         }
     }
 
-    static let staleMark = "данные устарели"
+    static func staleMark(language: AppLanguage) -> String {
+        L10n.staleMark(language)
+    }
 }

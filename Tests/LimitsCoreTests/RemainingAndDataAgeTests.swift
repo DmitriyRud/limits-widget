@@ -30,15 +30,23 @@ struct DataAgeTests {
     let now = Date(timeIntervalSince1970: 1_800_000_000)
 
     @Test func todayShowsOnlyTime() {
-        let fetched = now.addingTimeInterval(-3_600)  // 07:00 того же дня
-        #expect(ResetFormatter.dataAge(fetched, now: now, timeZone: utc) == "данные на 07:00")
+        let fetched = now.addingTimeInterval(-3_600)  // 07:00 same day
+        #expect(ResetFormatter.dataAge(fetched, now: now, timeZone: utc) == "as of 07:00")
+        #expect(
+            ResetFormatter.dataAge(fetched, now: now, timeZone: utc, language: .ru)
+                == "данные на 07:00")
     }
 
     @Test func earlierDayShowsDateAndTime() {
-        let fetched = now.addingTimeInterval(-3 * 86_400 - 1_800)  // 12 янв, 07:30
-        let text = ResetFormatter.dataAge(fetched, now: now, timeZone: utc)
-        #expect(text.hasPrefix("данные на 12 "))
-        #expect(text.contains("янв"))
-        #expect(text.hasSuffix("07:30"))
+        let fetched = now.addingTimeInterval(-3 * 86_400 - 1_800)  // 12 Jan, 07:30
+        let enText = ResetFormatter.dataAge(fetched, now: now, timeZone: utc)
+        #expect(enText.hasPrefix("as of 12 "))
+        #expect(enText.contains("Jan"))
+        #expect(enText.hasSuffix("07:30"))
+
+        let ruText = ResetFormatter.dataAge(fetched, now: now, timeZone: utc, language: .ru)
+        #expect(ruText.hasPrefix("данные на 12 "))
+        #expect(ruText.contains("янв"))
+        #expect(ruText.hasSuffix("07:30"))
     }
 }

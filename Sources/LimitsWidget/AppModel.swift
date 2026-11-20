@@ -18,6 +18,7 @@ final class AppModel {
         static let claude = "claudeEnabled"
         static let codex = "codexEnabled"
         static let antigravity = "antigravityEnabled"
+        static let language = "appLanguage"
     }
 
     /// Интервал обновления данных, секунды (минимум 60).
@@ -50,6 +51,11 @@ final class AppModel {
             scheduleRebuild()
         }
     }
+    var language: AppLanguage {
+        didSet {
+            defaults.set(language.rawValue, forKey: Key.language)
+        }
+    }
 
     private(set) var store: LimitsStore
     let loginItem = LoginItem()
@@ -65,10 +71,12 @@ final class AppModel {
         let claude = defaults.object(forKey: Key.claude) as? Bool ?? true
         let codex = defaults.object(forKey: Key.codex) as? Bool ?? true
         let antigravity = defaults.object(forKey: Key.antigravity) as? Bool ?? true
+        let savedLanguage = defaults.string(forKey: Key.language).flatMap(AppLanguage.init(rawValue:))
         self.refreshSeconds = refresh
         self.claudeEnabled = claude
         self.codexEnabled = codex
         self.antigravityEnabled = antigravity
+        self.language = savedLanguage ?? .default
         self.store = Self.makeStore(
             refresh: refresh, claude: claude, codex: codex, antigravity: antigravity)
     }

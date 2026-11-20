@@ -86,12 +86,12 @@ public struct AntigravityQuotaSummaryResponse: Sendable, Hashable, Decodable {
                     effectiveRemaining = 0.0
                 }
 
-                let label = Self.windowLabel(
+                let kind = Self.windowKind(
                     groupTitle: groupTitle, window: bucket.window, fallback: bucket.displayName)
                 let usedPercent = (1.0 - effectiveRemaining) * 100.0
                 result.append(
                     UsageWindow(
-                        kind: .named(label), usedPercent: usedPercent, resetsAt: bucket.resetTime))
+                        kind: kind, usedPercent: usedPercent, resetsAt: bucket.resetTime))
             }
         }
         return result
@@ -106,7 +106,7 @@ public struct AntigravityQuotaSummaryResponse: Sendable, Hashable, Decodable {
     }
 
     private static func shortGroupTitle(_ raw: String?) -> String {
-        guard let raw, !raw.trimmingCharacters(in: .whitespaces).isEmpty else { return "Лимит" }
+        guard let raw, !raw.trimmingCharacters(in: .whitespaces).isEmpty else { return "Limit" }
         var title = raw.trimmingCharacters(in: .whitespaces)
         for suffix in [" Models", " models"] where title.hasSuffix(suffix) {
             title.removeLast(suffix.count)
@@ -115,18 +115,18 @@ public struct AntigravityQuotaSummaryResponse: Sendable, Hashable, Decodable {
         return title.replacingOccurrences(of: " and ", with: " & ")
     }
 
-    private static func windowLabel(groupTitle: String, window: String?, fallback: String?)
-        -> String
+    private static func windowKind(groupTitle: String, window: String?, fallback: String?)
+        -> WindowKind
     {
         switch window?.lowercased() {
         case "5h":
-            return "\(groupTitle) · 5 ч"
+            return .group(groupTitle, .fiveHour)
         case "weekly":
-            return "\(groupTitle) · Неделя"
+            return .group(groupTitle, .weekly)
         case let other? where !other.isEmpty:
-            return "\(groupTitle) · \(other)"
+            return .group(groupTitle, .other(other))
         default:
-            return fallback ?? groupTitle
+            return .named(fallback ?? groupTitle)
         }
     }
 }

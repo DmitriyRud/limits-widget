@@ -108,9 +108,9 @@ struct AntigravityProviderTests {
         #expect(snapshot.displayName == "Antigravity")
         #expect(snapshot.status == .ok)
         #expect(snapshot.windows.count == 3)
-        #expect(ResetFormatter.title(for: snapshot.windows[0].kind) == "Gemini · 5 ч")
-        #expect(ResetFormatter.title(for: snapshot.windows[1].kind) == "Gemini · Неделя")
-        #expect(ResetFormatter.title(for: snapshot.windows[2].kind) == "Gemini 4 Argon · Неделя")
+        #expect(ResetFormatter.title(for: snapshot.windows[0].kind) == "Gemini · 5h")
+        #expect(ResetFormatter.title(for: snapshot.windows[1].kind) == "Gemini · Weekly")
+        #expect(ResetFormatter.title(for: snapshot.windows[2].kind) == "Gemini 4 Argon · Weekly")
 
         let recorded = await client.recordedRequests
         #expect(recorded.count == 1)

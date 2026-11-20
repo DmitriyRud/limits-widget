@@ -1,35 +1,37 @@
 import LimitsCore
 import SwiftUI
 
-/// Строка одного окна лимита: подпись, остаток лимита (бар и %), время до сброса (FR-005, FR-007, FR-012).
+/// Single usage window row: title, remaining bar & percent, relative countdown, and hover tooltip.
 struct WindowRow: View {
     let window: UsageWindow
     let now: Date
+    let language: AppLanguage
 
     var body: some View {
         let remaining = window.remainingPercent(now: now)
         VStack(alignment: .leading, spacing: 3) {
             HStack {
-                Text(ResetFormatter.title(for: window.kind)).font(.subheadline)
+                Text(ResetFormatter.title(for: window.kind, language: language)).font(.subheadline)
                 Spacer()
-                Text("осталось \(Int(remaining.rounded()))%").font(.subheadline.monospacedDigit())
+                Text(L10n.remainingPercent(Int(remaining.rounded()), language))
+                    .font(.subheadline.monospacedDigit())
             }
             UsageBar(fraction: remaining / 100, level: window.level(now: now))
-            Text(ResetFormatter.relative(until: window.resetsAt, now: now))
+            Text(ResetFormatter.relative(until: window.resetsAt, now: now, language: language))
                 .font(.caption).foregroundStyle(.secondary)
         }
         .help(tooltip)
     }
 
     private var tooltip: String {
-        guard let resetsAt = window.resetsAt else { return "Время сброса неизвестно" }
+        guard let resetsAt = window.resetsAt else { return L10n.resetTimeUnknown(language) }
         let text = resetsAt.formatted(
-            Date.FormatStyle(date: .long, time: .shortened).locale(Locale(identifier: "ru_RU")))
-        return "Сброс: \(text)"
+            Date.FormatStyle(date: .long, time: .shortened).locale(language.locale))
+        return L10n.resetsAt(text, language)
     }
 }
 
-/// Тонкий прогресс-бар остатка лимита с цветом по `UsageLevel` (FR-007).
+/// Remaining limit progress bar colored by `UsageLevel`.
 struct UsageBar: View {
     let fraction: Double
     let level: UsageLevel

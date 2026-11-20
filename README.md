@@ -1,80 +1,76 @@
 # Limits Widget
 
-Виджет для рабочего стола macOS. Показывает, сколько осталось от лимитов подписки ИИ-агентов **Claude Code**, **Codex CLI** и **Antigravity**:
-по 5-часовым и недельным окнам, со временем до сброса.
+A macOS desktop widget that shows remaining subscription limits for AI coding agents (**Claude Code**, **Codex CLI**, and **Antigravity**) across 5-hour and weekly windows, with live countdowns until reset.
 
-<img src="docs/images/widget.png" alt="Виджет на рабочем столе" width="282">
+<img src="docs/images/widget.png" alt="Limits Widget on macOS desktop" width="282">
 
-## Возможности
+## Features
 
-- Остаток лимита в процентах и полоса для каждого окна. Цвет полосы: зелёный, если осталось больше 30%, оранжевый при 10–30%,
-  красный при 10% и меньше.
-- Обратный отсчёт до сброса («через 3 ч 21 мин»). Точное время сброса видно при наведении.
-- Время, на которое актуальны данные, и пометка «данные устарели», если обновление не удалось.
-- Понятные статусы вместо пустоты: «Не авторизован», «Требуется вход — откройте Codex», «Ошибка сети».
-- Окно лежит на уровне рабочего стола, не мешает работе, перетаскивается и запоминает позицию.
-- Иконка в меню-баре: «Обновить», «Настройки…» (интервал обновления, выбор агентов), «Запускать при входе», «Выход».
+- Remaining limit percentage and progress bar for each window. Bar color: green (> 30% left), orange (10–30%), red (≤ 10%).
+- Live countdown until reset (`in 3h 21m`). Hover over any row to see the exact reset date and time.
+- Data freshness timestamp (`as of 10:17`, including date if older than today) and a `stale` indicator when a refresh fails.
+- Clear status messages instead of blank space: `Not signed in`, `Sign in required — open Codex`, `No data`, `Network error`.
+- Sits cleanly at desktop level without interfering with regular windows, draggable, and remembers its position.
+- Menu bar icon with **Refresh**, **Settings…** (refresh interval, agent toggles, language selector), **Launch at login**, and **Quit**.
+- **11 UI languages** (English default, plus German, Spanish, French, Italian, Norwegian, Icelandic, Finnish, Chinese Simplified, Japanese, and Russian) switchable live in Settings.
 
-## Требования
+## Requirements
 
-- macOS 14 Sonoma или новее.
-- Swift 6: Xcode 16+ или только Command Line Tools (`xcode-select --install`).
-- Вход в Claude Code, Codex CLI и/или запущенный Antigravity на этом Mac. Виджет пользуется их локальными данными и своих не просит.
+- macOS 14 Sonoma or newer.
+- Swift 6: Xcode 16+ or Command Line Tools (`xcode-select --install`).
+- Signed-in Claude Code, Codex CLI, and/or running Antigravity on this Mac. The widget reads their local state and never asks for your credentials directly.
 
-## Установка
+## Installation
 
 ```bash
 git clone https://github.com/DmitriyRud/limits-widget.git
 cd limits-widget
-scripts/bundle.sh                       # соберёт build/LimitsWidget.app
+scripts/bundle.sh                       # builds build/LimitsWidget.app
 cp -R build/LimitsWidget.app /Applications/
 open /Applications/LimitsWidget.app
 ```
 
-macOS может один раз спросить разрешение на доступ к элементу связки ключей «Claude Code-credentials». Нажмите
-«Всегда разрешать». Автозапуск включается в меню-баре пунктом «Запускать при входе» (работает только для `.app`).
+macOS may prompt once for permission to read the `"Claude Code-credentials"` Keychain item — click **Always Allow**. Launch at login can be enabled from the menu bar (`.app` bundle only).
 
-Для разработки можно запустить без бандла: `swift run LimitsWidget`.
+For development, you can also run without bundling: `swift run LimitsWidget`.
 
-## Откуда берутся данные
+## Data Sources
 
-| Агент | Учётные данные (только чтение) | Лимиты |
-|-------|--------------------------------|--------|
-| Claude Code | Keychain «Claude Code-credentials» через `/usr/bin/security`, запасной вариант — `~/.claude/.credentials.json` | `GET https://api.anthropic.com/api/oauth/usage` |
-| Codex CLI | `~/.codex/auth.json` (`tokens.access_token`, `tokens.account_id`) | `GET https://chatgpt.com/backend-api/wham/usage`; если запрос не удался — последние данные из журналов `~/.codex/sessions` |
-| Antigravity | Локальные метаданные демона `~/.gemini/antigravity/daemon/hub_*.json` (`httpsPort`, `csrfToken`) | Локальный RPC `POST https://127.0.0.1:<port>/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary` (фоллбэк `GetUserStatus`), без выхода в интернет |
+| Agent | Credentials / Discovery (read-only) | Limits Source |
+|-------|-------------------------------------|---------------|
+| Claude Code | Keychain `"Claude Code-credentials"` via `/usr/bin/security` (fallback: `~/.claude/.credentials.json`) | `GET https://api.anthropic.com/api/oauth/usage` |
+| Codex CLI | `~/.codex/auth.json` (`tokens.access_token`, `tokens.account_id`) | `GET https://chatgpt.com/backend-api/wham/usage` (fallback: latest session logs in `~/.codex/sessions`) |
+| Antigravity | Local daemon metadata `~/.gemini/antigravity/daemon/hub_*.json` (`httpsPort`, `csrfToken`) | Local loopback RPC `POST https://127.0.0.1:<port>/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary` (fallback: `GetUserStatus`), no internet requests |
 
-Данные обновляются раз в 5 минут (настраивается, минимум 60 с). Обратный отсчёт пересчитывается раз в минуту без сети.
+Data refreshes every 5 minutes by default (configurable in Settings, minimum 60s). Countdowns update every minute offline.
 
-## Безопасность
+For a detailed breakdown of Antigravity quota endpoints and limit pools, see [`antigravity-limits.md`](antigravity-limits.md).
 
-- Учётные данные агентов только читаются. Виджет их не меняет и не обновляет токены: если токен истёк, откройте сам агент.
-- Токены не логируются, не пишутся на диск и не выводятся в `description` моделей.
-- Каждый токен уходит только на хост своего провайдера: у каждого агента свой HTTP-клиент со списком разрешённых хостов,
-  HTTP-редиректы запрещены. Телеметрии и сторонних серверов нет.
-- Из ответов Codex и Antigravity не декодируются персональные поля (`email`, `name`, `user_id`, `account_id`, `profilePictureUrl`).
+## Security
 
-## Ограничения
+- Agent credentials are **read-only**. The widget never modifies files or Keychain items and never refreshes OAuth tokens: if a token expires, open the agent itself.
+- Tokens and CSRF secrets are never logged, written to disk, or exposed in model `description`/`Mirror`.
+- Each provider has its own isolated HTTP client with a strict host allowlist and HTTP redirects disabled. Zero telemetry, zero third-party servers.
+- Personal fields (`email`, `name`, `user_id`, `account_id`, `profilePictureUrl`) are intentionally not decoded.
 
-- Оба эндпоинта лимитов недокументированы и могут измениться. Тогда виджет покажет «Формат ответа изменился»,
-  а второй агент продолжит работать.
-- Поддерживаются только подписочные лимиты. Pay-as-you-go API-ключи и подсчёт стоимости — вне рамок.
+## Limitations
 
-## Разработка
+- Provider quota endpoints are undocumented and may change. If a response format changes, that provider shows `Response format changed` while all other providers continue working.
+- Only subscription limits are tracked. Pay-as-you-go API keys and dollar cost tracking are out of scope.
+
+## Development
 
 ```bash
-swift build                             # сборка
-scripts/test.sh                         # тесты (Swift Testing); не `swift test` напрямую
-swift format -i -r Sources Tests        # форматирование
+swift build                             # debug build
+scripts/test.sh                         # unit tests (Swift Testing); do not run `swift test` directly
+swift format -i -r Sources Tests        # format code
 ```
 
-- `Sources/LimitsCore` — модели, провайдеры, парсеры, форматирование. Без AppKit/SwiftUI, покрыто тестами на обезличенных фикстурах.
-- `Sources/LimitsWidget` — оболочка на AppKit/SwiftUI: панель на рабочем столе, меню-бар, настройки.
-- Процесс — Spec-Driven Development: [`specs/constitution.md`](specs/constitution.md), фича
-  [`specs/001-limits-widget-mvp/`](specs/001-limits-widget-mvp/) (spec → plan → tasks), решения в [`docs/adr/`](docs/adr/).
-- Новый агент добавляется отдельной реализацией протокола `LimitsProvider`, см. [`CLAUDE.md`](CLAUDE.md).
+- `Sources/LimitsCore` — models, providers, parsers, formatters, and localization. Pure Swift without AppKit/SwiftUI, covered by fixture-based unit tests.
+- `Sources/LimitsWidget` — AppKit/SwiftUI desktop panel, menu bar, and Settings UI.
+- Workflow — Spec-Driven Development: [`specs/constitution.md`](specs/constitution.md), feature specs in [`specs/`](specs/), architectural decisions in [`docs/adr/`](docs/adr/).
+- Adding a new agent only requires implementing `LimitsProvider`, see [`CLAUDE.md`](CLAUDE.md).
 
-## Благодарности
+## Credits
 
-Логотипы агентов взяты из [Simple Icons](https://simpleicons.org) (CC0-1.0). Товарные знаки Claude и OpenAI принадлежат
-их владельцам. Проект не связан с Anthropic и OpenAI.
+Agent logos are from [Simple Icons](https://simpleicons.org) (CC0-1.0). Claude, OpenAI, and Google Antigravity trademarks belong to their respective owners. This project is not affiliated with Anthropic, OpenAI, or Google.

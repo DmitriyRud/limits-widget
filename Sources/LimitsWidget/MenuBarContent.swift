@@ -1,23 +1,24 @@
 import AppKit
+import LimitsCore
 import SwiftUI
 
-/// Меню в строке меню (FR-010).
+/// Menu bar items (FR-010, localized via `L10n`).
 struct MenuBarContent: View {
     let model: AppModel
 
     var body: some View {
-        Button("Обновить") { model.refreshNow() }
-        Button("Настройки…") { SettingsWindow.show(model: model) }
+        let lang = model.language
+        Button(L10n.refresh(lang)) { model.refreshNow() }
+        Button(L10n.settingsMenu(lang)) { SettingsWindow.show(model: model) }
         Toggle(
-            model.loginItem.isAvailable
-                ? "Запускать при входе" : "Запускать при входе (только из .app)",
+            L10n.launchAtLogin(available: model.loginItem.isAvailable, lang),
             isOn: Binding(
                 get: { model.loginItem.isEnabled },
                 set: { model.loginItem.setEnabled($0) })
         )
         .disabled(!model.loginItem.isAvailable)
         Divider()
-        Button("Выход") { NSApp.terminate(nil) }
+        Button(L10n.quit(lang)) { NSApp.terminate(nil) }
             .keyboardShortcut("q")
     }
 }
