@@ -1,76 +1,108 @@
 # Limits Widget
 
-A macOS desktop widget that shows remaining subscription limits for AI coding agents (**Claude Code**, **Codex CLI**, and **Antigravity**) across 5-hour and weekly windows, with live countdowns until reset.
+**Always-visible macOS desktop widget for AI coding agent subscription limits** — track Claude Code, Codex CLI, and Antigravity 5-hour & weekly quotas at a glance.
 
-<img src="docs/images/widget.png" alt="Limits Widget on macOS desktop" width="282">
+[![macOS 14+](https://img.shields.io/badge/macOS-14.0%2B-000000?logo=apple&logoColor=white)](https://github.com/DmitriyRud/limits-widget/releases)
+[![Swift 6](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/DmitriyRud/limits-widget?include_prereleases&label=Release)](https://github.com/DmitriyRud/limits-widget/releases)
+
+<p align="center">
+  <img src="docs/images/widget.png" alt="Limits Widget on macOS desktop (Dark Mode)" width="282">
+</p>
+
+<!-- Optional: add a light-mode screenshot at docs/images/widget-light.png and uncomment below:
+![Limits Widget Light Mode](docs/images/widget-light.png)
+-->
+
+---
 
 ## Features
 
-- Remaining limit percentage and progress bar for each window. Bar color: green (> 30% left), orange (10–30%), red (≤ 10%).
-- Live countdown until reset (`in 3h 21m`). Hover over any row to see the exact reset date and time.
-- Data freshness timestamp (`as of 10:17`, including date if older than today) and a `stale` indicator when a refresh fails.
-- Clear status messages instead of blank space: `Not signed in`, `Sign in required — open Codex`, `No data`, `Network error`.
-- Sits cleanly at desktop level without interfering with regular windows, draggable, and remembers its position.
-- Menu bar icon with **Refresh**, **Settings…** (refresh interval, agent toggles, language selector), **Launch at login**, and **Quit**.
-- **11 UI languages** (English default, plus German, Spanish, French, Italian, Norwegian, Icelandic, Finnish, Chinese Simplified, Japanese, and Russian) switchable live in Settings.
+- **Multi-agent quota tracking** — Claude Code (`5 hours`, `Weekly`, optional Opus/Sonnet weekly), Codex CLI (`5 hours`, `Weekly`), and Antigravity (`Gemini · 5h`, `Gemini · Weekly`, `Claude & GPT · 5h`, `Claude & GPT · Weekly`, `Gemini 4 Argon · Weekly`).
+- **At-a-glance status bars** — remaining percentage with color-coded thresholds: green (> 30% left), orange (10–30%), red (≤ 10%).
+- **Live countdowns & tooltips** — updates every minute offline (`in 3h 21m`); hover any row for the exact reset date and time.
+- **Stale data protection** — shows data freshness (`as of 14:22`, including date if older than today) and keeps the last known values marked `stale` if a refresh fails.
+- **Native desktop widget feel** — borderless macOS-style frosted card sitting at desktop level (above desktop icons, below regular windows), draggable with persistent position.
+- **Menu bar controls** — quick **Refresh**, **Settings…** (agent toggles, refresh interval, language), **Launch at login**, and **Quit**.
+- **11 UI languages** — English (default), German, Spanish, French, Italian, Norwegian, Icelandic, Finnish, Chinese (Simplified), Japanese, and Russian — switchable live without restarting.
+- **Lightweight & zero dependencies** — pure Swift 6 + SwiftUI/AppKit, < 1% idle CPU, < 50 MB RAM, no third-party packages.
 
 ## Requirements
 
-- macOS 14 Sonoma or newer.
-- Swift 6: Xcode 16+ or Command Line Tools (`xcode-select --install`).
-- Signed-in Claude Code, Codex CLI, and/or running Antigravity on this Mac. The widget reads their local state and never asks for your credentials directly.
+- **macOS 14.0 (Sonoma)** or newer.
+- **Architecture:** Apple Silicon (`arm64`) — or Universal (`arm64` + `x86_64`) / Intel when built from source.
+- Signed-in **Claude Code**, **Codex CLI**, and/or running **Antigravity** on your Mac. The widget reads their local state and never asks for your credentials.
 
 ## Installation
+
+### Option 1: Download Pre-Built App (Recommended)
+
+1. Download the latest `LimitsWidget-v1.0.0.zip` from **[GitHub Releases](https://github.com/DmitriyRud/limits-widget/releases)** or **[Gumroad](https://rudakovdev.gumroad.com/l/limits-widget)** (*Pay What You Want — $0+*).
+2. Unzip and drag `LimitsWidget.app` into `/Applications/`.
+3. Launch `LimitsWidget.app` (see the Gatekeeper note below for the first launch).
+
+### Option 2: Build from Source
+
+Requires Swift 6 (Xcode 16+ or Command Line Tools via `xcode-select --install`):
 
 ```bash
 git clone https://github.com/DmitriyRud/limits-widget.git
 cd limits-widget
-scripts/bundle.sh                       # builds build/LimitsWidget.app
+scripts/bundle.sh                       # builds release build/LimitsWidget.app
 cp -R build/LimitsWidget.app /Applications/
 open /Applications/LimitsWidget.app
 ```
 
-macOS may prompt once for permission to read the `"Claude Code-credentials"` Keychain item — click **Always Allow**. Launch at login can be enabled from the menu bar (`.app` bundle only).
+For quick development runs without bundling: `swift run LimitsWidget`.
 
-For development, you can also run without bundling: `swift run LimitsWidget`.
+### First Launch & macOS Gatekeeper
 
-## Data Sources
+Because Limits Widget is distributed independently without a paid Apple Developer ID notarization certificate, macOS Gatekeeper will warn you on the first launch (*"Apple could not verify…" / "unidentified developer"*). You can open it safely using any of these methods:
 
-| Agent | Credentials / Discovery (read-only) | Limits Source |
-|-------|-------------------------------------|---------------|
-| Claude Code | Keychain `"Claude Code-credentials"` via `/usr/bin/security` (fallback: `~/.claude/.credentials.json`) | `GET https://api.anthropic.com/api/oauth/usage` |
-| Codex CLI | `~/.codex/auth.json` (`tokens.access_token`, `tokens.account_id`) | `GET https://chatgpt.com/backend-api/wham/usage` (fallback: latest session logs in `~/.codex/sessions`) |
-| Antigravity | Local daemon metadata `~/.gemini/antigravity/daemon/hub_*.json` (`httpsPort`, `csrfToken`) | Local loopback RPC `POST https://127.0.0.1:<port>/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary` (fallback: `GetUserStatus`), no internet requests |
+1. **Finder right-click:** Right-click (or Control-click) `LimitsWidget.app` in `/Applications/` → click **Open** → confirm **Open**.
+2. **System Settings:** Try opening the app once, then go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway**.
+3. **Terminal (removes the quarantine flag):**
+   ```bash
+   xattr -cr /Applications/LimitsWidget.app
+   ```
 
-Data refreshes every 5 minutes by default (configurable in Settings, minimum 60s). Countdowns update every minute offline.
+> **Keychain prompt (Claude Code):** macOS may ask once for permission to read `"Claude Code-credentials"` via `/usr/bin/security`. Click **Always Allow** so it won't prompt again.
 
-For a detailed breakdown of Antigravity quota endpoints and limit pools, see [`antigravity-limits.md`](antigravity-limits.md).
+## Data Sources & Privacy
 
-## Security
+| Agent | Local Discovery / Credentials (Read-Only) | Limits Source |
+|---|---|---|
+| **Claude Code** | Keychain `"Claude Code-credentials"` via `/usr/bin/security` (fallback: `~/.claude/.credentials.json`) | `GET https://api.anthropic.com/api/oauth/usage` |
+| **Codex CLI** | `~/.codex/auth.json` (`tokens.access_token`, `tokens.account_id`) | `GET https://chatgpt.com/backend-api/wham/usage` (fallback: `~/.codex/sessions` logs) |
+| **Antigravity** | `~/.gemini/antigravity/daemon/hub_*.json` (`httpsPort`, `csrfToken`) | Local loopback RPC `POST https://127.0.0.1:<port>/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary` (fallback: `GetUserStatus`) — **zero internet requests** |
 
-- Agent credentials are **read-only**. The widget never modifies files or Keychain items and never refreshes OAuth tokens: if a token expires, open the agent itself.
-- Tokens and CSRF secrets are never logged, written to disk, or exposed in model `description`/`Mirror`.
-- Each provider has its own isolated HTTP client with a strict host allowlist and HTTP redirects disabled. Zero telemetry, zero third-party servers.
-- Personal fields (`email`, `name`, `user_id`, `account_id`, `profilePictureUrl`) are intentionally not decoded.
+- **Strictly read-only:** never modifies agent files or Keychain items, never refreshes OAuth tokens.
+- **No telemetry, no third-party servers:** each provider has its own isolated HTTP client with a strict host allowlist and redirects disabled.
+- **No secret logging:** tokens and CSRF secrets are redacted in all string/mirror representations; personal fields (`email`, `name`, `user_id`, `account_id`, `profilePictureUrl`) are not decoded.
 
-## Limitations
+For full details on Antigravity quota endpoints and limit pools, see [`antigravity-limits.md`](antigravity-limits.md).
 
-- Provider quota endpoints are undocumented and may change. If a response format changes, that provider shows `Response format changed` while all other providers continue working.
-- Only subscription limits are tracked. Pay-as-you-go API keys and dollar cost tracking are out of scope.
+## Support the Project
+
+Limits Widget is free and open-source under the MIT License. If it saves you from hitting rate limits mid-task, you can support ongoing development with a *Pay What You Want* ($0+) download or tip on Gumroad:
+
+👉 **[Support on Gumroad](https://rudakovdev.gumroad.com/l/limits-widget)**
 
 ## Development
 
 ```bash
 swift build                             # debug build
-scripts/test.sh                         # unit tests (Swift Testing); do not run `swift test` directly
-swift format -i -r Sources Tests        # format code
+scripts/test.sh                         # Swift Testing suite (do not run `swift test` directly with CLT)
+swift format -i -r Sources Tests        # format Swift code
 ```
 
-- `Sources/LimitsCore` — models, providers, parsers, formatters, and localization. Pure Swift without AppKit/SwiftUI, covered by fixture-based unit tests.
-- `Sources/LimitsWidget` — AppKit/SwiftUI desktop panel, menu bar, and Settings UI.
-- Workflow — Spec-Driven Development: [`specs/constitution.md`](specs/constitution.md), feature specs in [`specs/`](specs/), architectural decisions in [`docs/adr/`](docs/adr/).
-- Adding a new agent only requires implementing `LimitsProvider`, see [`CLAUDE.md`](CLAUDE.md).
+- `Sources/LimitsCore` — pure Swift models, providers, parsers, formatters, and localization (no AppKit/SwiftUI).
+- `Sources/LimitsWidget` — macOS AppKit/SwiftUI desktop panel, menu bar, and Settings UI.
+- See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`docs/adr/`](docs/adr/) for architecture notes and contribution guidelines.
 
-## Credits
+## License & Credits
+
+Released under the [MIT License](LICENSE).
 
 Agent logos are from [Simple Icons](https://simpleicons.org) (CC0-1.0). Claude, OpenAI, and Google Antigravity trademarks belong to their respective owners. This project is not affiliated with Anthropic, OpenAI, or Google.

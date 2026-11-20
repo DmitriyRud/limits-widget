@@ -1,7 +1,21 @@
+# SwiftPM & build artifacts
 .build/
 build/
 .swiftpm/
+DerivedData/
+*.dmg
+*.zip
+
+# Xcode
 *.xcodeproj/
+*.xcworkspace/
 xcuserdata/
+*.xcuserstate
+
+# macOS & environment
 .DS_Store
+.env
+.env.*
+
+# Local agent settings
 .claude/settings.local.json
