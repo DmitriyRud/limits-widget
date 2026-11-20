@@ -40,6 +40,8 @@ public enum ResetFormatter {
         case .session5h: "5 часов"
         case .weekly: "Неделя"
         case .weeklyModel(let model): "Неделя · \(model)"
+        case .overall: "Общий лимит"
+        case .named(let label): label
         case .custom(let minutes): minutes % 60 == 0 ? "\(minutes / 60) ч" : "\(minutes) мин"
         }
     }

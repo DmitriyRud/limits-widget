@@ -1,0 +1,51 @@
+{
+  "userStatus": {
+    "acceptedLatestTermsOfService": true,
+    "email": "REDACTED",
+    "name": "REDACTED",
+    "profilePictureUrl": "REDACTED",
+    "cascadeModelConfigData": {
+      "clientModelConfigs": [
+        {
+          "label": "Gemini 4 Neon (High)",
+          "quotaInfo": {
+            "remainingFraction": 0.9645665,
+            "resetTime": "2026-11-20T02:12:51Z"
+          }
+        },
+        {
+          "label": "Gemini 4 Neon (Medium)",
+          "quotaInfo": {
+            "remainingFraction": 0.9645665,
+            "resetTime": "2026-11-20T02:12:51Z"
+          }
+        },
+        {
+          "label": "Gemini 4 Argon (Medium)",
+          "quotaInfo": {
+            "remainingFraction": 1,
+            "resetTime": "2026-11-26T21:54:29Z"
+          }
+        },
+        {
+          "label": "Claude Opus 5.5 (High)",
+          "quotaInfo": {
+            "remainingFraction": 1,
+            "resetTime": "2026-11-20T02:54:29Z"
+          }
+        },
+        {
+          "label": "GPT-OSS 120B (Medium)",
+          "quotaInfo": {
+            "remainingFraction": 1,
+            "resetTime": "2026-11-20T02:54:29Z"
+          }
+        },
+        {
+          "label": "Gemini 4 Carbon",
+          "quotaInfo": {}
+        }
+      ]
+    }
+  }
+}

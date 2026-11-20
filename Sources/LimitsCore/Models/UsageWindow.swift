@@ -8,6 +8,10 @@ public enum WindowKind: Hashable, Sendable {
     case weekly
     /// Недельное окно для конкретной модели (например, "Opus").
     case weeklyModel(String)
+    /// Общий агрегированный лимит (например, минимум по моделям).
+    case overall
+    /// Именованное окно лимита (например, пул моделей + период: «Gemini · 5 ч»).
+    case named(String)
     /// Окно нестандартной длины.
     case custom(minutes: Int)
 

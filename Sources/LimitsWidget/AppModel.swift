@@ -17,6 +17,7 @@ final class AppModel {
         static let refresh = "refreshIntervalSeconds"
         static let claude = "claudeEnabled"
         static let codex = "codexEnabled"
+        static let antigravity = "antigravityEnabled"
     }
 
     /// Интервал обновления данных, секунды (минимум 60).
@@ -43,6 +44,12 @@ final class AppModel {
             scheduleRebuild()
         }
     }
+    var antigravityEnabled: Bool {
+        didSet {
+            defaults.set(antigravityEnabled, forKey: Key.antigravity)
+            scheduleRebuild()
+        }
+    }
 
     private(set) var store: LimitsStore
     let loginItem = LoginItem()
@@ -57,13 +64,16 @@ final class AppModel {
         let refresh = max(seconds, Self.minimumRefreshSeconds)
         let claude = defaults.object(forKey: Key.claude) as? Bool ?? true
         let codex = defaults.object(forKey: Key.codex) as? Bool ?? true
+        let antigravity = defaults.object(forKey: Key.antigravity) as? Bool ?? true
         self.refreshSeconds = refresh
         self.claudeEnabled = claude
         self.codexEnabled = codex
-        self.store = Self.makeStore(refresh: refresh, claude: claude, codex: codex)
+        self.antigravityEnabled = antigravity
+        self.store = Self.makeStore(
+            refresh: refresh, claude: claude, codex: codex, antigravity: antigravity)
     }
 
-    var hasEnabledProviders: Bool { claudeEnabled || codexEnabled }
+    var hasEnabledProviders: Bool { claudeEnabled || codexEnabled || antigravityEnabled }
 
     /// Первый запуск: store.start() делает refresh сразу.
     func start() {
@@ -80,8 +90,11 @@ final class AppModel {
     /// клиенты переиспользуются, поэтому `URLSession` не накапливаются. Свой allowlist у каждого (II.3).
     private static let claudeHTTP = URLSessionHTTPClient.forClaude()
     private static let codexHTTP = URLSessionHTTPClient.forCodex()
+    private static let antigravityClient = LoopbackAntigravityLocalClient()
 
-    private static func makeStore(refresh: Int, claude: Bool, codex: Bool) -> LimitsStore {
+    private static func makeStore(
+        refresh: Int, claude: Bool, codex: Bool, antigravity: Bool
+    ) -> LimitsStore {
         var providers: [any LimitsProvider] = []
         if claude {
             providers.append(
@@ -89,6 +102,9 @@ final class AppModel {
                     credentials: ChainedCredentialSource.standard(), http: claudeHTTP))
         }
         if codex { providers.append(CodexProvider(http: codexHTTP)) }
+        if antigravity {
+            providers.append(AntigravityProvider(client: antigravityClient))
+        }
         return LimitsStore(providers: providers, refreshInterval: .seconds(refresh))
     }
 
@@ -105,7 +121,9 @@ final class AppModel {
 
     private func rebuild() {
         store.stop()
-        store = Self.makeStore(refresh: refreshSeconds, claude: claudeEnabled, codex: codexEnabled)
+        store = Self.makeStore(
+            refresh: refreshSeconds, claude: claudeEnabled, codex: codexEnabled,
+            antigravity: antigravityEnabled)
         store.start()
     }
 }

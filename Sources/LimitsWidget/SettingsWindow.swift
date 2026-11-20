@@ -29,6 +29,7 @@ struct SettingsView: View {
             Section("Агенты") {
                 Toggle("Claude Code", isOn: $model.claudeEnabled)
                 Toggle("Codex", isOn: $model.codexEnabled)
+                Toggle("Antigravity", isOn: $model.antigravityEnabled)
             }
             Section("Обновление") {
                 Stepper(

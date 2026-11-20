@@ -1,7 +1,7 @@
 # Limits Widget
 
-Виджет для рабочего стола macOS. Показывает, сколько осталось от лимитов подписки ИИ-агентов **Claude Code** и **Codex CLI**:
-по 5-часовому окну и по недельному, со временем до сброса.
+Виджет для рабочего стола macOS. Показывает, сколько осталось от лимитов подписки ИИ-агентов **Claude Code**, **Codex CLI** и **Antigravity**:
+по 5-часовым и недельным окнам, со временем до сброса.
 
 <img src="docs/images/widget.png" alt="Виджет на рабочем столе" width="282">
 
@@ -19,7 +19,7 @@
 
 - macOS 14 Sonoma или новее.
 - Swift 6: Xcode 16+ или только Command Line Tools (`xcode-select --install`).
-- Вход в Claude Code и/или Codex CLI на этом Mac. Виджет пользуется их учётными данными и своих не просит.
+- Вход в Claude Code, Codex CLI и/или запущенный Antigravity на этом Mac. Виджет пользуется их локальными данными и своих не просит.
 
 ## Установка
 
@@ -42,6 +42,7 @@ macOS может один раз спросить разрешение на до
 |-------|--------------------------------|--------|
 | Claude Code | Keychain «Claude Code-credentials» через `/usr/bin/security`, запасной вариант — `~/.claude/.credentials.json` | `GET https://api.anthropic.com/api/oauth/usage` |
 | Codex CLI | `~/.codex/auth.json` (`tokens.access_token`, `tokens.account_id`) | `GET https://chatgpt.com/backend-api/wham/usage`; если запрос не удался — последние данные из журналов `~/.codex/sessions` |
+| Antigravity | Локальные метаданные демона `~/.gemini/antigravity/daemon/hub_*.json` (`httpsPort`, `csrfToken`) | Локальный RPC `POST https://127.0.0.1:<port>/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary` (фоллбэк `GetUserStatus`), без выхода в интернет |
 
 Данные обновляются раз в 5 минут (настраивается, минимум 60 с). Обратный отсчёт пересчитывается раз в минуту без сети.
 
@@ -51,7 +52,7 @@ macOS может один раз спросить разрешение на до
 - Токены не логируются, не пишутся на диск и не выводятся в `description` моделей.
 - Каждый токен уходит только на хост своего провайдера: у каждого агента свой HTTP-клиент со списком разрешённых хостов,
   HTTP-редиректы запрещены. Телеметрии и сторонних серверов нет.
-- Из ответа Codex не декодируются персональные поля (`email`, `user_id`, `account_id`).
+- Из ответов Codex и Antigravity не декодируются персональные поля (`email`, `name`, `user_id`, `account_id`, `profilePictureUrl`).
 
 ## Ограничения
 

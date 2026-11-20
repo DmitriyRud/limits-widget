@@ -20,6 +20,13 @@ struct ProviderBrandingTests {
         #expect(branding.tintRGB == nil)  // цвет текста (адаптируется к теме)
     }
 
+    @Test func antigravityHasSVGLogo() {
+        let branding = AntigravityProvider.branding
+        #expect(branding.logoSVG.hasPrefix("<svg"))
+        #expect(branding.logoSVG.contains("<path"))
+        #expect(branding.tintRGB == 0x4285F4)
+    }
+
     @Test func storeExposesBrandingByProviderID() {
         let store = LimitsStore(providers: [
             FakeProvider(id: "a"),

@@ -42,4 +42,9 @@ struct ResetFormatterTests {
     @Test func percentIsClamped() {
         #expect(UsageWindow(kind: .weekly, usedPercent: 140, resetsAt: nil).usedPercent == 100)
     }
+
+    @Test func overallWindowTitle() {
+        #expect(ResetFormatter.title(for: .overall) == "Общий лимит")
+        #expect(ResetFormatter.title(for: .named("Gemini · 5 ч")) == "Gemini · 5 ч")
+    }
 }
